@@ -16,8 +16,8 @@
 
     <!-- Top Navigation / Tabs -->
     <header class="w-full max-w-2xl mx-auto px-6 py-6 flex justify-between items-center text-sm">
-        <div class="font-medium tracking-tight text-neutral-900">
-            ✨ <span class="cursor-pointer" @click="activeTab = 'home'">Synchronicity</span>
+        <div class="font-medium tracking-tight text-neutral-900 cursor-pointer" @click="activeTab = 'home'">
+            ✨ Synchronicity
         </div>
         <nav class="flex space-x-6 text-neutral-500">
             <button @click="activeTab = 'home'" :class="activeTab === 'home' ? 'text-neutral-900 font-semibold' : 'hover:text-neutral-900'" class="transition">Log</button>
@@ -68,7 +68,7 @@
             </div>
 
             <!-- All Logs View -->
-            <div x-show="explorerSubTab === 'logs'" class="space-y-3 max-h-96 overflow-y-auto pr-1">
+            <div x-show="explorerSubTab === 'logs'" x-cloak class="space-y-3 max-h-96 overflow-y-auto pr-1">
                 <template x-if="entries.length === 0">
                     <p class="text-neutral-400 text-sm py-8 text-center">No logs recorded yet.</p>
                 </template>
@@ -119,7 +119,7 @@
 
     <!-- Minimal Footer -->
     <footer class="w-full text-center py-6 text-xs text-neutral-400">
-        Minimalist Synchronicity Tracker
+        GUS INC. 2026
     </footer>
 
     <!-- App Logic -->
