@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Synchronicity</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Alpine.js CDN for reactivity -->
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+</head>
+<body class="bg-white text-neutral-900 min-h-screen font-sans antialiased flex flex-col justify-between" x-data="synchronicityApp()">
+
+    <!-- Top Navigation / Tabs -->
+    <header class="w-full max-w-2xl mx-auto px-6 py-6 flex justify-between items-center text-sm">
+        <div class="font-medium tracking-tight text-neutral-900">
+            ✨ <span class="cursor-pointer" @click="activeTab = 'home'">Synchronicity</span>
+        </div>
+        <nav class="flex space-x-6 text-neutral-500">
+            <button @click="activeTab = 'home'" :class="activeTab === 'home' ? 'text-neutral-900 font-semibold' : 'hover:text-neutral-900'" class="transition">Log</button>
+            <button @click="activeTab = 'explorer'" :class="activeTab === 'explorer' ? 'text-neutral-900 font-semibold' : 'hover:text-neutral-900'" class="transition">Data Explorer</button>
+            <button @click="activeTab = 'display'" :class="activeTab === 'display' ? 'text-neutral-900 font-semibold' : 'hover:text-neutral-900'" class="transition">Display Setup</button>
+        </nav>
+    </header>
+
+    <!-- Main Content Area -->
+    <main class="w-full max-w-xl mx-auto px-6 flex-grow flex flex-col justify-center items-center -mt-16">
+
+        <!-- TAB 1: HOME (Google-like minimalist submission) -->
+        <div x-show="activeTab === 'home'" class="w-full text-center">
+            
+            <!-- Dynamic Homepage Display Configured by User -->
+            <template x-if="displayConfig.showGreeting">
+                <h1 class="text-2xl font-normal text-neutral-800 mb-8">What crossed your path twice today?</h1>
+            </template>
+
+            <form @submit.prevent="addEntry" class="w-full">
+                <div class="relative w-full max-w-lg mx-auto">
+                    <input type="text" x-model="newTopic" placeholder="e.g., Blue butterfly, 444, Carl Jung" 
+                           class="w-full bg-white border border-neutral-200 rounded-full px-6 py-4 text-neutral-900 placeholder-neutral-400 shadow-sm hover:shadow-md focus:shadow-md focus:outline-none focus:border-neutral-400 transition text-base"
+                           required autofocus>
+                    <button type="submit" class="absolute right-3 top-1/2 -translate-y-1/2 bg-neutral-900 hover:bg-neutral-800 text-white px-5 py-2 rounded-full text-sm font-medium transition">
+                        Log
+                    </button>
+                </div>
+            </form>
+
+            <template x-if="displayConfig.showQuickStats">
+                <p class="text-xs text-neutral-400 mt-8" x-text="entries.length + ' total entries logged so far.'"></p>
+            </template>
+        </div>
+
+        <!-- TAB 2: DATA EXPLORER -->
+        <div x-show="activeTab === 'explorer'" class="w-full py-6">
+            <h2 class="text-xl font-normal mb-6 text-neutral-800">Data Explorer</h2>
+
+            <div class="flex border-b border-neutral-200 mb-6 text-sm">
+                <button @click="explorerSubTab = 'logs'" :class="explorerSubTab === 'logs' ? 'border-b-2 border-neutral-900 font-medium text-neutral-900' : 'text-neutral-400'" class="pb-3 px-4 transition">All Logs</button>
+                <button @click="explorerSubTab = 'patterns'" :class="explorerSubTab === 'patterns' ? 'border-b-2 border-neutral-900 font-medium text-neutral-900' : 'text-neutral-400'" class="pb-3 px-4 transition">Repeated Topics</button>
+            </div>
+
+            <!-- All Logs View -->
+            <div x-show="explorerSubTab === 'logs'" class="space-y-3 max-h-96 overflow-y-auto pr-1">
+                <template x-if="entries.length === 0">
+                    <p class="text-neutral-400 text-sm py-8 text-center">No logs recorded yet.</p>
+                </template>
+                <template x-for="entry in entries" :key="entry.id">
+                    <div class="flex justify-between items-center bg-neutral-50 border border-neutral-200/60 p-4 rounded-xl text-sm">
+                        <div>
+                            <span class="font-medium text-neutral-900" x-text="entry.topic"></span>
+                            <span class="text-xs text-neutral-400 ml-2" x-text="entry.date"></span>
+                        </div>
+                        <button @click="deleteEntry(entry.id)" class="text-neutral-400 hover:text-rose-600 transition text-xs">Remove</button>
+                    </div>
+                </template>
+            </div>
+
+            <!-- Repeated Topics View -->
+            <div x-show="explorerSubTab === 'patterns'" class="space-y-3 max-h-96 overflow-y-auto pr-1">
+                <template x-if="frequentTopics.length === 0">
+                    <p class="text-neutral-400 text-sm py-8 text-center">No topics recorded twice yet.</p>
+                </template>
+                <template x-for="item in frequentTopics" :key="item.topic">
+                    <div class="flex justify-between items-center bg-neutral-50 border border-neutral-200/60 p-4 rounded-xl text-sm">
+                        <span class="font-medium text-neutral-900" x-text="item.topic"></span>
+                        <span class="text-xs bg-neutral-200 text-neutral-700 px-2.5 py-1 rounded-full" x-text="item.count + ' occurrences'"></span>
+                    </div>
+                </template>
+            </div>
+        </div>
+
+        <!-- TAB 3: DISPLAY SETUP (Choose what to show visually on the site) -->
+        <div x-show="activeTab === 'display'" class="w-full py-6">
+            <h2 class="text-xl font-normal mb-2 text-neutral-800">Display Settings</h2>
+            <p class="text-sm text-neutral-500 mb-6">Customize what elements appear on your home screen.</p>
+
+            <div class="space-y-4 text-sm">
+                <label class="flex items-center justify-between p-4 bg-neutral-50 border border-neutral-200/60 rounded-xl cursor-pointer">
+                    <span class="text-neutral-900 font-medium">Show central question greeting</span>
+                    <input type="checkbox" x-model="displayConfig.showGreeting" @change="saveDisplayConfig" class="w-4 h-4 accent-neutral-900 rounded">
+                </label>
+
+                <label class="flex items-center justify-between p-4 bg-neutral-50 border border-neutral-200/60 rounded-xl cursor-pointer">
+                    <span class="text-neutral-900 font-medium">Show total logs count footer</span>
+                    <input type="checkbox" x-model="displayConfig.showQuickStats" @change="saveDisplayConfig" class="w-4 h-4 accent-neutral-900 rounded">
+                </label>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Minimal Footer -->
+    <footer class="w-full text-center py-6 text-xs text-neutral-400">
+        Minimalist Synchronicity Tracker
+    </footer>
+
+    <!-- App Logic -->
+    <script>
+        function synchronicityApp() {
+            return {
+                activeTab: 'home',
+                explorerSubTab: 'logs',
+                newTopic: '',
+                entries: JSON.parse(localStorage.getItem('sync_entries_clean')) || [],
+                displayConfig: JSON.parse(localStorage.getItem('sync_display_config')) || {
+                    showGreeting: true,
+                    showQuickStats: true
+                },
+
+                addEntry() {
+                    if (!this.newTopic.trim()) return;
+
+                    const newEntry = {
+                        id: Date.now(),
+                        topic: this.newTopic.trim(),
+                        date: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })
+                    };
+
+                    this.entries.unshift(newEntry);
+                    localStorage.setItem('sync_entries_clean', JSON.stringify(this.entries));
+                    this.newTopic = '';
+                },
+
+                deleteEntry(id) {
+                    this.entries = this.entries.filter(e => e.id !== id);
+                    localStorage.setItem('sync_entries_clean', JSON.stringify(this.entries));
+                },
+
+                saveDisplayConfig() {
+                    localStorage.setItem('sync_display_config', JSON.stringify(this.displayConfig));
+                },
+
+                get frequentTopics() {
+                    const counts = {};
+                    this.entries.forEach(e => {
+                        const t = e.topic.toLowerCase().trim();
+                        counts[t] = (counts[t] || 0) + 1;
+                    });
+                    return Object.keys(counts)
+                        .filter(t => counts[t] >= 2)
+                        .map(t => ({ topic: t, count: counts[t] }));
+                }
+            }
+        }
+    </script>
+</body>
+</html>
