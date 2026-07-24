@@ -8,6 +8,9 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Alpine.js CDN -->
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <style>
+        [x-cloak] { display: none !important; }
+    </style>
 </head>
 <body class="bg-white text-neutral-900 min-h-screen font-sans antialiased flex flex-col justify-between" x-data="synchronicityApp()">
 
@@ -27,7 +30,7 @@
     <main class="w-full max-w-xl mx-auto px-6 flex-grow flex flex-col justify-center items-center -mt-16">
 
         <!-- TAB 1: HOME -->
-        <div x-show="activeTab === 'home'" class="w-full text-center" style="display: none;" :style="activeTab === 'home' ? 'display: block;' : 'display: none;'">
+        <div x-show="activeTab === 'home'" x-cloak class="w-full text-center">
             
             <template x-if="displayConfig.showGreeting">
                 <h1 class="text-2xl font-normal text-neutral-800 mb-8">What crossed your path twice today?</h1>
@@ -44,7 +47,7 @@
                         </button>
                     </div>
 
-                    <div x-show="justSubmitted" class="absolute inset-0 flex items-center justify-center bg-neutral-50 border border-neutral-200 rounded-full text-neutral-800 text-sm font-medium shadow-sm" style="display: none;">
+                    <div x-show="justSubmitted" x-cloak class="absolute inset-0 flex items-center justify-center bg-neutral-50 border border-neutral-200 rounded-full text-neutral-800 text-sm font-medium shadow-sm">
                         <span>✨ Logged successfully</span>
                     </div>
                 </div>
@@ -56,7 +59,7 @@
         </div>
 
         <!-- TAB 2: DATA EXPLORER -->
-        <div x-show="activeTab === 'explorer'" class="w-full py-6" style="display: none;" :style="activeTab === 'explorer' ? 'display: block;' : 'display: none;'">
+        <div x-show="activeTab === 'explorer'" x-cloak class="w-full py-6">
             <h2 class="text-xl font-normal mb-6 text-neutral-800">Data Explorer</h2>
 
             <div class="flex border-b border-neutral-200 mb-6 text-sm">
@@ -81,7 +84,7 @@
             </div>
 
             <!-- Repeated Topics View -->
-            <div x-show="explorerSubTab === 'patterns'" class="space-y-3 max-h-96 overflow-y-auto pr-1" style="display: none;" :style="explorerSubTab === 'patterns' ? 'display: block;' : 'display: none;'">
+            <div x-show="explorerSubTab === 'patterns'" x-cloak class="space-y-3 max-h-96 overflow-y-auto pr-1">
                 <template x-if="frequentTopics.length === 0">
                     <p class="text-neutral-400 text-sm py-8 text-center">No topics recorded twice yet.</p>
                 </template>
@@ -95,7 +98,7 @@
         </div>
 
         <!-- TAB 3: DISPLAY SETUP -->
-        <div x-show="activeTab === 'display'" class="w-full py-6" style="display: none;" :style="activeTab === 'display' ? 'display: block;' : 'display: none;'">
+        <div x-show="activeTab === 'display'" x-cloak class="w-full py-6">
             <h2 class="text-xl font-normal mb-2 text-neutral-800">Display Settings</h2>
             <p class="text-sm text-neutral-500 mb-6">Customize what elements appear on your home screen.</p>
 
