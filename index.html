@@ -155,14 +155,39 @@
         </div>
 
         <!-- PRIVATE TAB CONTENT -->
-        <div x-show="activeTab === 'private'" class="w-full py-6 text-center">
+        <div x-show="activeTab === 'private'" class="w-full py-6">
             <div class="flex justify-between items-center mb-6">
-                <h2 class="text-xl font-normal text-neutral-800">Private Area</h2>
+                <h2 class="text-xl font-normal text-neutral-800">Private Vault</h2>
                 <button @click="lockPrivate()" class="text-xs text-neutral-400 hover:text-neutral-900 transition">Lock Session</button>
             </div>
-            <div class="bg-neutral-50 border border-neutral-200/60 p-8 rounded-2xl text-sm text-neutral-600">
-                <p class="mb-2 font-medium text-neutral-900">🔒 Secure vault unlocked successfully.</p>
-                <p>This is your separate password-protected space (PIN: 4111) for personal notes, private entries, or restricted settings.</p>
+
+            <!-- Private Submission Form -->
+            <div class="bg-neutral-50 border border-neutral-200/60 p-6 rounded-2xl mb-6">
+                <h3 class="text-sm font-medium text-neutral-900 mb-3">Add Private Entry</h3>
+                <form @submit.prevent="addPrivateEntry" class="space-y-3">
+                    <input type="text" x-model="newPrivateTopic" placeholder="Enter private note or entry..." 
+                           class="w-full bg-white border border-neutral-200 rounded-xl px-4 py-3 text-sm text-neutral-900 placeholder-neutral-400 focus:outline-none focus:border-neutral-400 transition"
+                           required>
+                    <button type="submit" class="w-full bg-neutral-900 hover:bg-neutral-800 text-white py-2.5 rounded-xl text-xs font-medium transition">
+                        Save to Private Vault
+                    </button>
+                </form>
+            </div>
+
+            <!-- Private Entries List -->
+            <div class="space-y-3 max-h-72 overflow-y-auto pr-1">
+                <template x-if="privateEntries.length === 0">
+                    <p class="text-neutral-400 text-sm py-4 text-center">No private entries recorded yet.</p>
+                </template>
+                <template x-for="entry in privateEntries" :key="entry.id">
+                    <div class="flex justify-between items-center bg-white border border-neutral-200/60 p-4 rounded-xl text-sm">
+                        <div>
+                            <span class="font-medium text-neutral-900" x-text="entry.topic"></span>
+                            <span class="text-xs text-neutral-400 ml-2" x-text="entry.date"></span>
+                        </div>
+                        <button @click="deletePrivateEntry(entry.id)" class="text-neutral-400 hover:text-rose-600 transition text-xs">Remove</button>
+                    </div>
+                </template>
             </div>
         </div>
 
@@ -180,6 +205,7 @@
                 activeTab: 'home',
                 explorerSubTab: 'logs',
                 newTopic: '',
+                newPrivateTopic: '',
                 justSubmitted: false,
                 chartInstance: null,
                 enteredPin: '',
@@ -188,6 +214,7 @@
                 pinCode: '4111',
                 
                 entries: JSON.parse(localStorage.getItem('sync_entries_clean')) || [],
+                privateEntries: JSON.parse(localStorage.getItem('sync_private_entries')) || [],
                 displayConfig: JSON.parse(localStorage.getItem('sync_display_config')) || {
                     showGreeting: true,
                     showQuickStats: true
@@ -241,10 +268,29 @@
                     }, 1500);
                 },
 
+                addPrivateEntry() {
+                    if (!this.newPrivateTopic.trim()) return;
+
+                    const newEntry = {
+                        id: Date.now(),
+                        topic: this.newPrivateTopic.trim(),
+                        date: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })
+                    };
+
+                    this.privateEntries.unshift(newEntry);
+                    localStorage.setItem('sync_private_entries', JSON.stringify(this.privateEntries));
+                    this.newPrivateTopic = '';
+                },
+
                 deleteEntry(id) {
                     this.entries = this.entries.filter(e => e.id !== id);
                     localStorage.setItem('sync_entries_clean', JSON.stringify(this.entries));
                     if (this.explorerSubTab === 'chart') this.renderChart();
+                },
+
+                deletePrivateEntry(id) {
+                    this.privateEntries = this.privateEntries.filter(e => e.id !== id);
+                    localStorage.setItem('sync_private_entries', JSON.stringify(this.privateEntries));
                 },
 
                 saveDisplayConfig() {
