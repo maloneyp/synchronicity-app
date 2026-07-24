@@ -6,7 +6,7 @@
     <title>Synchronicity</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Alpine.js CDN for reactivity -->
+    <!-- Alpine.js CDN -->
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
 </head>
 <body class="bg-white text-neutral-900 min-h-screen font-sans antialiased flex flex-col justify-between" x-data="synchronicityApp()">
@@ -26,24 +26,16 @@
     <!-- Main Content Area -->
     <main class="w-full max-w-xl mx-auto px-6 flex-grow flex flex-col justify-center items-center -mt-16">
 
-        <!-- TAB 1: HOME (Google-like minimalist submission) -->
-        <div x-show="activeTab === 'home'" class="w-full text-center">
+        <!-- TAB 1: HOME -->
+        <div x-show="activeTab === 'home'" class="w-full text-center" style="display: none;" :style="activeTab === 'home' ? 'display: block;' : 'display: none;'">
             
-            <!-- Dynamic Homepage Display Configured by User -->
             <template x-if="displayConfig.showGreeting">
                 <h1 class="text-2xl font-normal text-neutral-800 mb-8">What crossed your path twice today?</h1>
             </template>
 
-            <!-- Form Wrapper with Transition -->
             <form @submit.prevent="addEntry" class="w-full">
                 <div class="relative w-full max-w-lg mx-auto h-14">
-                    
-                    <!-- Input State -->
-                    <div x-show="!justSubmitted" 
-                         x-transition:leave="transition ease-in duration-150"
-                         x-transition:leave-start="opacity-100 scale-100"
-                         x-transition:leave-end="opacity-0 scale-95"
-                         class="absolute inset-0">
+                    <div x-show="!justSubmitted" class="absolute inset-0">
                         <input type="text" x-model="newTopic" placeholder="e.g., Blue butterfly, 444, Carl Jung" 
                                class="w-full bg-white border border-neutral-200 rounded-full px-6 py-4 text-neutral-900 placeholder-neutral-400 shadow-sm hover:shadow-md focus:shadow-md focus:outline-none focus:border-neutral-400 transition text-base"
                                required autofocus>
@@ -52,15 +44,9 @@
                         </button>
                     </div>
 
-                    <!-- Slick Success State -->
-                    <div x-show="justSubmitted" 
-                         x-transition:enter="transition ease-out duration-200"
-                         x-transition:enter-start="opacity-0 scale-95"
-                         x-transition:enter-end="opacity-100 scale-100"
-                         class="absolute inset-0 flex items-center justify-center bg-neutral-50 border border-neutral-200 rounded-full text-neutral-800 text-sm font-medium shadow-sm">
+                    <div x-show="justSubmitted" class="absolute inset-0 flex items-center justify-center bg-neutral-50 border border-neutral-200 rounded-full text-neutral-800 text-sm font-medium shadow-sm" style="display: none;">
                         <span>✨ Logged successfully</span>
                     </div>
-
                 </div>
             </form>
 
@@ -70,7 +56,7 @@
         </div>
 
         <!-- TAB 2: DATA EXPLORER -->
-        <div x-show="activeTab === 'explorer'" class="w-full py-6">
+        <div x-show="activeTab === 'explorer'" class="w-full py-6" style="display: none;" :style="activeTab === 'explorer' ? 'display: block;' : 'display: none;'">
             <h2 class="text-xl font-normal mb-6 text-neutral-800">Data Explorer</h2>
 
             <div class="flex border-b border-neutral-200 mb-6 text-sm">
@@ -95,7 +81,7 @@
             </div>
 
             <!-- Repeated Topics View -->
-            <div x-show="explorerSubTab === 'patterns'" class="space-y-3 max-h-96 overflow-y-auto pr-1">
+            <div x-show="explorerSubTab === 'patterns'" class="space-y-3 max-h-96 overflow-y-auto pr-1" style="display: none;" :style="explorerSubTab === 'patterns' ? 'display: block;' : 'display: none;'">
                 <template x-if="frequentTopics.length === 0">
                     <p class="text-neutral-400 text-sm py-8 text-center">No topics recorded twice yet.</p>
                 </template>
@@ -109,7 +95,7 @@
         </div>
 
         <!-- TAB 3: DISPLAY SETUP -->
-        <div x-show="activeTab === 'display'" class="w-full py-6">
+        <div x-show="activeTab === 'display'" class="w-full py-6" style="display: none;" :style="activeTab === 'display' ? 'display: block;' : 'display: none;'">
             <h2 class="text-xl font-normal mb-2 text-neutral-800">Display Settings</h2>
             <p class="text-sm text-neutral-500 mb-6">Customize what elements appear on your home screen.</p>
 
@@ -162,7 +148,6 @@
                     this.newTopic = '';
                     this.justSubmitted = true;
 
-                    // Hide success message and bring back input after 1.5 seconds
                     setTimeout(() => {
                         this.justSubmitted = false;
                     }, 1500);
