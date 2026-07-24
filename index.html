@@ -21,8 +21,9 @@
         </div>
         <nav class="flex space-x-6 text-neutral-500">
             <button @click="activeTab = 'home'" :class="activeTab === 'home' ? 'text-neutral-900 font-semibold' : 'hover:text-neutral-900'" class="transition">Log</button>
-            <button @click="handleExplorerClick()" :class="activeTab === 'explorer' ? 'text-neutral-900 font-semibold' : 'hover:text-neutral-900'" class="transition">Data Explorer</button>
+            <button @click="activeTab = 'explorer'" :class="activeTab === 'explorer' ? 'text-neutral-900 font-semibold' : 'hover:text-neutral-900'" class="transition">Data Explorer</button>
             <button @click="activeTab = 'display'" :class="activeTab === 'display' ? 'text-neutral-900 font-semibold' : 'hover:text-neutral-900'" class="transition">Display Setup</button>
+            <button @click="handlePrivateClick()" :class="activeTab === 'auth' || activeTab === 'private' ? 'text-neutral-900 font-semibold' : 'hover:text-neutral-900'" class="transition">Private</button>
         </nav>
     </header>
 
@@ -36,8 +37,7 @@
                 <h1 class="text-2xl font-normal text-neutral-800 mb-8">What crossed your path twice today?</h1>
             </template>
 
-            <form @submit.prevent="addEntry" class="w-full space-y-4">
-                <!-- Input Field -->
+            <form @submit.prevent="addEntry" class="w-full">
                 <div class="relative w-full max-w-lg mx-auto h-14">
                     <div x-show="!justSubmitted" class="absolute inset-0">
                         <input type="text" x-model="newTopic" placeholder="e.g., Blue butterfly, 444, Carl Jung" 
@@ -59,34 +59,15 @@
             </template>
         </div>
 
-        <!-- AUTH MODAL / SCREEN FOR DATA EXPLORER -->
-        <div x-show="activeTab === 'auth'" class="w-full max-w-sm py-6 text-center">
-            <h2 class="text-xl font-normal mb-2 text-neutral-800">Private Access</h2>
-            <p class="text-sm text-neutral-500 mb-6">Enter your PIN to view personal data explorer logs.</p>
-
-            <form @submit.prevent="verifyPin" class="space-y-4">
-                <input type="password" x-model="enteredPin" placeholder="Enter PIN" maxlength="6"
-                       class="w-full bg-white border border-neutral-200 rounded-full px-6 py-3 text-center text-neutral-900 placeholder-neutral-400 shadow-sm focus:outline-none focus:border-neutral-400 transition text-base tracking-widest"
-                       required autofocus>
-                <button type="submit" class="w-full bg-neutral-900 hover:bg-neutral-800 text-white py-3 rounded-full text-sm font-medium transition">
-                    Unlock Explorer
-                </button>
-                <p x-show="pinError" class="text-xs text-rose-600 mt-2">Incorrect PIN. Try again.</p>
-            </form>
-        </div>
-
-        <!-- TAB 2: DATA EXPLORER (Protected) -->
+        <!-- TAB 2: DATA EXPLORER (Unprotected, with chart & table) -->
         <div x-show="activeTab === 'explorer'" class="w-full py-6">
-            <div class="flex justify-between items-center mb-6">
-                <h2 class="text-xl font-normal text-neutral-800">Data Explorer</h2>
-                <button @click="lockExplorer()" class="text-xs text-neutral-400 hover:text-neutral-900 transition">Lock Session</button>
-            </div>
+            <h2 class="text-xl font-normal mb-6 text-neutral-800">Data Explorer</h2>
 
             <!-- Sub-navigation for Explorer -->
-            <div class="flex border-b border-neutral-200 mb-6 text-sm space-x-4">
-                <button @click="explorerSubTab = 'logs'" :class="explorerSubTab === 'logs' ? 'border-b-2 border-neutral-900 font-medium text-neutral-900' : 'text-neutral-400'" class="pb-3 px-2 transition">All Logs</button>
-                <button @click="explorerSubTab = 'patterns'" :class="explorerSubTab === 'patterns' ? 'border-b-2 border-neutral-900 font-medium text-neutral-900' : 'text-neutral-400'" class="pb-3 px-2 transition">Repeated</button>
-                <button @click="explorerSubTab = 'chart'; $nextTick(() => renderChart())" :class="explorerSubTab === 'chart' ? 'border-b-2 border-neutral-900 font-medium text-neutral-900' : 'text-neutral-400'" class="pb-3 px-2 transition">Trends</button>
+            <div class="flex border-b border-neutral-200 mb-6 text-sm">
+                <button @click="explorerSubTab = 'logs'" :class="explorerSubTab === 'logs' ? 'border-b-2 border-neutral-900 font-medium text-neutral-900' : 'text-neutral-400'" class="pb-3 px-4 transition">All Logs</button>
+                <button @click="explorerSubTab = 'patterns'" :class="explorerSubTab === 'patterns' ? 'border-b-2 border-neutral-900 font-medium text-neutral-900' : 'text-neutral-400'" class="pb-3 px-4 transition">Repeated Topics</button>
+                <button @click="explorerSubTab = 'chart'; $nextTick(() => renderChart())" :class="explorerSubTab === 'chart' ? 'border-b-2 border-neutral-900 font-medium text-neutral-900' : 'text-neutral-400'" class="pb-3 px-4 transition">Visual Trends</button>
             </div>
 
             <!-- All Logs View (Table Format) -->
@@ -99,7 +80,7 @@
                         <thead>
                             <tr class="border-b border-neutral-200 text-neutral-400 text-xs uppercase tracking-wider">
                                 <th class="pb-3 font-medium">Topic</th>
-                                <th class="pb-3 font-medium">Date</th>
+                                <th class="pb-3 font-medium">Date Logged</th>
                                 <th class="pb-3 font-medium text-right">Action</th>
                             </tr>
                         </thead>
@@ -157,6 +138,34 @@
             </div>
         </div>
 
+        <!-- AUTH MODAL / SCREEN FOR PRIVATE SECTION -->
+        <div x-show="activeTab === 'auth'" class="w-full max-w-sm py-6 text-center">
+            <h2 class="text-xl font-normal mb-2 text-neutral-800">Private Access</h2>
+            <p class="text-sm text-neutral-500 mb-6">Enter your PIN to access your private section.</p>
+
+            <form @submit.prevent="verifyPin" class="space-y-4">
+                <input type="password" x-model="enteredPin" placeholder="Enter PIN" maxlength="6"
+                       class="w-full bg-white border border-neutral-200 rounded-full px-6 py-3 text-center text-neutral-900 placeholder-neutral-400 shadow-sm focus:outline-none focus:border-neutral-400 transition text-base tracking-widest"
+                       required autofocus>
+                <button type="submit" class="w-full bg-neutral-900 hover:bg-neutral-800 text-white py-3 rounded-full text-sm font-medium transition">
+                    Unlock Private Area
+                </button>
+                <p x-show="pinError" class="text-xs text-rose-600 mt-2">Incorrect PIN. Try again.</p>
+            </form>
+        </div>
+
+        <!-- PRIVATE TAB CONTENT -->
+        <div x-show="activeTab === 'private'" class="w-full py-6 text-center">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-xl font-normal text-neutral-800">Private Area</h2>
+                <button @click="lockPrivate()" class="text-xs text-neutral-400 hover:text-neutral-900 transition">Lock Session</button>
+            </div>
+            <div class="bg-neutral-50 border border-neutral-200/60 p-8 rounded-2xl text-sm text-neutral-600">
+                <p class="mb-2 font-medium text-neutral-900">🔒 Secure vault unlocked successfully.</p>
+                <p>This is your separate password-protected space (PIN: 4111) for personal notes, private entries, or restricted settings.</p>
+            </div>
+        </div>
+
     </main>
 
     <!-- Footer -->
@@ -175,8 +184,8 @@
                 chartInstance: null,
                 enteredPin: '',
                 pinError: false,
-                isUnlocked: localStorage.getItem('sync_unlocked') === 'true',
-                pinCode: '0422', // <--- Change your private PIN code right here if desired
+                isPrivateUnlocked: localStorage.getItem('sync_private_unlocked') === 'true',
+                pinCode: '4111',
                 
                 entries: JSON.parse(localStorage.getItem('sync_entries_clean')) || [],
                 displayConfig: JSON.parse(localStorage.getItem('sync_display_config')) || {
@@ -184,9 +193,9 @@
                     showQuickStats: true
                 },
 
-                handleExplorerClick() {
-                    if (this.isUnlocked) {
-                        this.activeTab = 'explorer';
+                handlePrivateClick() {
+                    if (this.isPrivateUnlocked) {
+                        this.activeTab = 'private';
                     } else {
                         this.activeTab = 'auth';
                         this.pinError = false;
@@ -196,19 +205,19 @@
 
                 verifyPin() {
                     if (this.enteredPin === this.pinCode) {
-                        this.isUnlocked = true;
-                        localStorage.setItem('sync_unlocked', 'true');
+                        this.isPrivateUnlocked = true;
+                        localStorage.setItem('sync_private_unlocked', 'true');
                         this.pinError = false;
-                        this.activeTab = 'explorer';
+                        this.activeTab = 'private';
                     } else {
                         this.pinError = true;
                         this.enteredPin = '';
                     }
                 },
 
-                lockExplorer() {
-                    this.isUnlocked = false;
-                    localStorage.removeItem('sync_unlocked');
+                lockPrivate() {
+                    this.isPrivateUnlocked = false;
+                    localStorage.removeItem('sync_private_unlocked');
                     this.activeTab = 'home';
                 },
 
